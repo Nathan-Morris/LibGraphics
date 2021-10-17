@@ -18,18 +18,30 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GFXShaderProgram.cpp">
+    <ClCompile Include="GFXGlobalInclude.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GFXGlobalInclude.cpp">
+    <ClCompile Include="GFXWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GFXObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GFXShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GFXShaderProgram.h">
+    <ClInclude Include="GFXGlobalInclude.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GFXGlobalInclude.h">
+    <ClInclude Include="GFXWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GFXObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GFXShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

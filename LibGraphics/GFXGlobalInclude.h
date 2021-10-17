@@ -3,6 +3,10 @@
 
 #pragma once
 
+#include <iostream>
+#include <vector>
+#include <map>
+
 #include <gl/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -23,6 +27,6 @@ static inline bool __GFX_INIT__() {
 	return true;
 }
 
-const extern bool __GFX_INID__;
+const extern bool __GFX_INITD__;
 
 #endif
