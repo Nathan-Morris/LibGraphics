@@ -16,6 +16,10 @@ void GFXWindow::swapBuffers() {
 	glfwSwapBuffers(this->gfxWindow);
 }
 
+void GFXWindow::setInputMode(int mode, int value) {
+	glfwSetInputMode(this->gfxWindow, mode, value);
+}
+
 bool GFXWindow::makeContextCurrent() {
 	glfwMakeContextCurrent(this->gfxWindow);
 	return glewInit() == GLEW_OK;

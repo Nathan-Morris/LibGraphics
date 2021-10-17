@@ -14,13 +14,23 @@
 #pragma comment(lib, "glew32")
 #pragma comment(lib, "glfw3dll")
 
+#ifndef _GFX_GLFW_CONTEXT_VERSION_MAJOR
+#	define	_GFX_GLFW_CONTEXT_VERSION_MAJOR 3
+#endif
+
+#ifndef _GFX_GLFW_CONTEXT_VERSION_MINOR
+#	define	_GFX_GLFW_CONTEXT_VERSION_MINOR 3
+#endif
+
 static inline bool __GFX_INIT__() {
+	glewExperimental = true;
+
 	if (!glfwInit()) {
 		exit(-10);
 	}
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, _GFX_GLFW_CONTEXT_VERSION_MAJOR);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, _GFX_GLFW_CONTEXT_VERSION_MINOR);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	

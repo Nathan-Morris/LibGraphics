@@ -33,7 +33,7 @@ struct GFXVertex {
 
 /*
 Bit flags to specify what operations
-need to be performed on verticies
+need to be performed on vertices
 prior to rendering
 */
 typedef struct _gfx_object_hints{
@@ -74,14 +74,23 @@ public:
 		this->vertices.push_back(vertex);
 	}
 
+	GFXVertex<vertexDimensions>& getVertex(size_t at) {
+		return this->vertices.at(at);
+	}
+
 	void render(GLenum drawMode) {
+		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-		glBufferData(
-			GL_ARRAY_BUFFER,
-			sizeof(GFXVertex<vertexDimensions>) * vertices.size(),
-			vertices.data(),
-			this->hints.staticVertices ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW
-		);
+		if (!this->hints.staticVertices || !this->hints.bufferedVertices) {
+			glBufferData(
+				GL_ARRAY_BUFFER,
+				sizeof(GFXVertex<vertexDimensions>) * vertices.size(),
+				vertices.data(),
+				GL_DYNAMIC_DRAW
+			);
+
+			this->hints.bufferedVertices = true;
+		}
 		glVertexAttribPointer(
 			0,
 			vertexDimensions,
@@ -90,11 +99,11 @@ public:
 			sizeof(GFXVertex<vertexDimensions>),
 			NULL
 		);
-		glEnableVertexAttribArray(0);
 		glDrawArrays(
 			drawMode,
 			0,
 			this->vertices.size()
 		);
+		glDisableVertexAttribArray(0);
 	}
 };
