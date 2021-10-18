@@ -6,33 +6,40 @@ const char* vertexShader = R"(
 #version 330 core
 
 layout (location = 0) in vec3 inPos;
-layout (location = 1) in vec3 inColor;
 
-out vec3 vertexColor;
-
-uniform mat4 uProjectionMatrix;
-uniform mat4 uModelTranslate;
+out vec4 vertexOutColor;
 
 void main() {
-    gl_Position = uProjectionMatrix * uModelTranslate * vec4(inPos.xyz, 1.0);
-    vertexColor = inColor;
+    gl_Position = vec4(inPos, 1);
+    vertexOutColor = vec4(.5, 0, 0, 1);
 }
 )";
 
 const char* fragmentShader = R"(
 #version 330 core
 
-out vec4 fragColor;
+out vec3 outColor;
 
-in vec4 vertexColor;
+uniform vec3 inColor;
 
 void main() {
-    fragColor = vertexColor;
+    outColor = inColor;
+    //outColor = vec3(1, 1, 1);
 }
 )";
 
+typedef struct {
+    GLfloat x;
+    GLfloat y;
+} GLfloatXY;
+
+static void projectMotionVectorCalc(GLfloatXY* pCoord, GLfloat vInit, GLfloat time, GLfloat g, GLfloat radTheta) {
+    pCoord->y = vInit * sinf(radTheta) - (g * time);
+    pCoord->x = vInit * cosf(radTheta); // redundant, does not need to be calculated each time
+}
+
 int main() {
-    GFXWindow window(740, 740, "Hello, World!");
+    GFXWindow window(1024, 512, "Physics");
 
     window.makeContextCurrent();
     window.setInputMode(GLFW_STICKY_KEYS, GL_TRUE);
@@ -41,7 +48,6 @@ int main() {
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
 
-
     GFXShader shader(
         vertexShader,
         fragmentShader
@@ -49,54 +55,63 @@ int main() {
 
     shader.use();
 
-    GFXObjectHints hints = { 0 };
-    hints.staticVertices = 1;
+    GFXObject<2> vectorAll({ 0 });
+    GFXObject<2> vectorX({ 0 });
+    GFXObject<2> vectorY({ 0 });
 
-    GFXObject<3> cube(hints);
+    GLfloat graphX0 = -.9f;
+    GLfloat graphY0 = -.9f;
 
-    cube.addVertex({ 0, 1, 0 });
-    cube.addVertex({ -1, 0, -1 });
-    cube.addVertex({ 1, 0, -1 });
+    GFXObject<2> graphXY = {
+        { graphX0, -1.f },
+        { graphX0, 1.f },
+        { -1.f, graphY0 },
+        { 1.f, graphY0 }
+    };
 
-    cube.addVertex({ 0, 1, 0 });
-    cube.addVertex({ -1, 0, -1 }); 
-    cube.addVertex({ -1, 0, 1 });
+    GFXObject<2> graphPlot;
 
-    cube.addVertex({ 0, 1, 0 });
-    cube.addVertex({ 1, 0, 1 });
-    cube.addVertex({ -1, 0, 1 });
+    GLuint inColorLocation = shader.getUniform("inColor");
 
-    cube.addVertex({ 0, 1, 0 });
-    cube.addVertex({ 1, 0, 1 });
-    cube.addVertex({ 1, 0, -1 });
+    GLfloat velocityInit = 100;
+    GLfloat g = 9.81;
+    GLfloat theta = glm::radians(60.f);
 
-    cube.addVertex({ 0, 1, 0 });
-    cube.addVertex({ 1, 0, 1 });
-    cube.addVertex({ 1, 0, -1 });
+    GLfloat maxY = (velocityInit * sinf(theta)) * (velocityInit * sinf(theta)) / (2.f * g);
+    GLfloat maxX = velocityInit * velocityInit * sinf(2.f * theta) / g;
 
-    cube.addVertex({ -1, 0, 1 });
-    cube.addVertex({ 1, 0, 1 });
-    cube.addVertex({ -1, 0, -1 });
+    GLfloat graphXScale = 1.9 / maxX;
 
-    glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(1.0f, 1.0f, 0.0f));
-    glm::mat4 modelTransform = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, 0.0f));
-    glm::mat4 view = glm::lookAt(glm::vec3(1, 0, -3), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 modelview = view * modelTransform * rotation;
-    glm::mat4 projectionMatrix = glm::perspective(glm::radians(90.f), (float)740 / (float)740, .1f, 10.0f);
-
-    GLuint matTransformLocation = shader.getUniform("uModelTranslate");
-    GLuint matProjectionLocation = shader.getUniform("uProjectionMatrix");
-
-    glEnable(GL_DEPTH_TEST);
+    for (
+        GLfloat dTime = 2.f * velocityInit * sinf(theta) / g, time = 0.f, timeStep = .01f;
+        time < dTime;
+        time += timeStep
+    ) {
+        graphPlot.addVertex({
+            ((velocityInit * cosf(theta) * time) * graphXScale) + graphX0,
+            (((velocityInit * sinf(theta) * time) - (.5f * g * time * time)) * graphXScale) + graphY0
+        });
+    }
 
     do {
         glClear(GL_COLOR_BUFFER_BIT);
-        
-        glUniformMatrix4fv(matTransformLocation, 1, GL_FALSE, glm::value_ptr(modelview));
-        glUniformMatrix4fv(matProjectionLocation, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
+        // render graph XY lines
+        glUniform3f(inColorLocation, 1.f, 1.f, 1.f);
+        graphXY.render(GL_LINES);
 
-        cube.render(GL_TRIANGLES);
+        // render graph plot
+        graphPlot.render(GL_POINTS);
+
+        // render vector
+        glUniform3f(inColorLocation, 1.f, 1.f, 1.f);
+
+        // render vector y component
+        glUniform3f(inColorLocation, 1.f, 0.f, 0.f);
+
+        // render vector x component
+        glUniform3f(inColorLocation, 0.f, 0.f, 1.f);
+
 
         window.swapBuffers();
         glfwPollEvents();

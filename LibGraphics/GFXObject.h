@@ -61,9 +61,16 @@ protected:
 	GLuint VBO;
 
 public:
-
-	GFXObject(GFXObjectHints objHints) : hints(objHints) {
+	GFXObject(const GFXObjectHints& objHints) : hints(objHints) {
 		glGenBuffers(1, &this->VBO);
+	}
+
+	GFXObject() : GFXObject(GFXObjectHints({ 0 })) {
+
+	}
+
+	GFXObject(const std::initializer_list<GFXVertex<vertexDimensions>>& initVertices) : GFXObject(GFXObjectHints({ 0 })) {
+		this->vertices.insert(this->vertices.begin(), initVertices);
 	}
 
 	~GFXObject() {
@@ -80,17 +87,20 @@ public:
 
 	void render(GLenum drawMode) {
 		glEnableVertexAttribArray(0);
+		
 		glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
+		
 		if (!this->hints.staticVertices || !this->hints.bufferedVertices) {
 			glBufferData(
 				GL_ARRAY_BUFFER,
 				sizeof(GFXVertex<vertexDimensions>) * vertices.size(),
 				vertices.data(),
-				GL_DYNAMIC_DRAW
+				this->hints.staticVertices ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW
 			);
 
 			this->hints.bufferedVertices = true;
 		}
+		
 		glVertexAttribPointer(
 			0,
 			vertexDimensions,
@@ -99,11 +109,13 @@ public:
 			sizeof(GFXVertex<vertexDimensions>),
 			NULL
 		);
+		
 		glDrawArrays(
 			drawMode,
 			0,
 			this->vertices.size()
 		);
+		
 		glDisableVertexAttribArray(0);
 	}
 };
