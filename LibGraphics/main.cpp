@@ -55,9 +55,18 @@ int main() {
 
     shader.use();
 
-    GFXObject<2> vectorAll({ 0 });
-    GFXObject<2> vectorX({ 0 });
-    GFXObject<2> vectorY({ 0 });
+    GFXObject<2> vectorAll = {
+        { 0 , 0 },
+        { 0 , 0 }
+    };
+    GFXObject<2> vectorX = {
+        { 0 , 0 },
+        { 0 , 0 }
+    };
+    GFXObject<2> vectorY = {
+        { 0 , 0 },
+        { 0 , 0 }
+    };
 
     GLfloat graphX0 = -.9f;
     GLfloat graphY0 = -.9f;
@@ -77,13 +86,20 @@ int main() {
     GLfloat g = 9.81;
     GLfloat theta = glm::radians(60.f);
 
+    GLfloatXY velocityVector = {
+       velocityInit * cosf(theta),
+       velocityInit * sinf(theta)
+    };
+
     GLfloat maxY = (velocityInit * sinf(theta)) * (velocityInit * sinf(theta)) / (2.f * g);
     GLfloat maxX = velocityInit * velocityInit * sinf(2.f * theta) / g;
 
     GLfloat graphXScale = 1.9 / maxX;
 
+    GLfloat dTime = 2.f * velocityInit * sinf(theta) / g, time = 0.f, timeStep = .01f;
+
     for (
-        GLfloat dTime = 2.f * velocityInit * sinf(theta) / g, time = 0.f, timeStep = .01f;
+        ;
         time < dTime;
         time += timeStep
     ) {
@@ -92,6 +108,8 @@ int main() {
             (((velocityInit * sinf(theta) * time) - (.5f * g * time * time)) * graphXScale) + graphY0
         });
     }
+
+    time = 0.f;
 
     do {
         glClear(GL_COLOR_BUFFER_BIT);
@@ -103,14 +121,48 @@ int main() {
         // render graph plot
         graphPlot.render(GL_POINTS);
 
+        // set vector vertices
+        if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
+            vectorX.getVertex(0) = {
+                ((velocityInit * cosf(theta) * time) * graphXScale) + graphX0,
+                (((velocityInit * sinf(theta) * time) - (.5f * g * time * time)) * graphXScale) + graphY0
+            };
+
+            vectorX.getVertex(1) = {
+                vectorX.getVertex(0).at(0) + (velocityVector.x / 100.f),
+                vectorX.getVertex(0).at(1)
+            };
+
+            vectorY.getVertex(0) = vectorX.getVertex(0);
+
+            vectorY.getVertex(1) = {
+                 vectorY.getVertex(0).at(0),
+                 vectorY.getVertex(0).at(1) + (velocityVector.y / 100.f),
+            };
+
+            vectorAll.getVertex(0) = vectorX.getVertex(0);
+
+            vectorAll.getVertex(1) = {
+                vectorX.getVertex(1).at(0),
+                vectorY.getVertex(1).at(1)
+            };
+
+            projectMotionVectorCalc(&velocityVector, velocityInit, time, g, theta);
+
+            time += timeStep;
+        }
+
         // render vector
-        glUniform3f(inColorLocation, 1.f, 1.f, 1.f);
+        glUniform3f(inColorLocation, 0.f, 1.f, 0.f);
+        vectorAll.render(GL_LINES);
 
         // render vector y component
         glUniform3f(inColorLocation, 1.f, 0.f, 0.f);
+        vectorY.render(GL_LINES);
 
         // render vector x component
         glUniform3f(inColorLocation, 0.f, 0.f, 1.f);
+        vectorX.render(GL_LINES);
 
 
         window.swapBuffers();

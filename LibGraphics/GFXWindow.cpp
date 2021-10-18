@@ -16,6 +16,10 @@ void GFXWindow::swapBuffers() {
 	glfwSwapBuffers(this->gfxWindow);
 }
 
+bool GFXWindow::isKeyPressed(int key) {
+	return (bool)glfwGetKey(this->gfxWindow, key);
+}
+
 void GFXWindow::setInputMode(int mode, int value) {
 	glfwSetInputMode(this->gfxWindow, mode, value);
 }

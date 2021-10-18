@@ -16,6 +16,8 @@ public:
 	void swapBuffers();
 	void setInputMode(int mode, int value);
 
+	bool isKeyPressed(int key);
+
 	bool makeContextCurrent();
 	bool shouldClose();
 };
