@@ -27,7 +27,5 @@ public:
 	GLuint getUniform(const char* uniformName);
 
 	void use();
-
-	//bool compile(FILE* errOutputFile = stderr);
 };
 
