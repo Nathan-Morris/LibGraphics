@@ -84,7 +84,7 @@ int main() {
 
     GLfloat velocityInit = 100;
     GLfloat g = 9.81;
-    GLfloat theta = glm::radians(60.f);
+    GLfloat theta = glm::radians((GLfloat)70.f);
 
     GLfloatXY velocityVector = {
        velocityInit * cosf(theta),
@@ -95,8 +95,9 @@ int main() {
     GLfloat maxX = velocityInit * velocityInit * sinf(2.f * theta) / g;
 
     GLfloat graphXScale = 1.9 / maxX;
+    GLfloat vectorComponentScale = 150.f;
 
-    GLfloat dTime = 2.f * velocityInit * sinf(theta) / g, time = 0.f, timeStep = .01f;
+    GLfloat dTime = 2.f * velocityInit * sinf(theta) / g, time = 0.f, timeStep = .005f;
 
     for (
         ;
@@ -129,7 +130,7 @@ int main() {
             };
 
             vectorX.getVertex(1) = {
-                vectorX.getVertex(0).at(0) + (velocityVector.x / 100.f),
+                vectorX.getVertex(0).at(0) + (velocityVector.x / vectorComponentScale),
                 vectorX.getVertex(0).at(1)
             };
 
@@ -137,7 +138,7 @@ int main() {
 
             vectorY.getVertex(1) = {
                  vectorY.getVertex(0).at(0),
-                 vectorY.getVertex(0).at(1) + (velocityVector.y / 100.f),
+                 vectorY.getVertex(0).at(1) + (velocityVector.y / vectorComponentScale),
             };
 
             vectorAll.getVertex(0) = vectorX.getVertex(0);
