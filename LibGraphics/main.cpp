@@ -2,16 +2,18 @@
 #include "GFXObject.h"
 #include "GFXShader.h"
 
+#include "ExampleApps.h"
+
 const char* vertexShader = R"(
 #version 330 core
 
 layout (location = 0) in vec3 inPos;
 
-out vec4 vertexOutColor;
+uniform mat4 MVP;
 
 void main() {
-    gl_Position = vec4(inPos, 1);
-    vertexOutColor = vec4(.5, 0, 0, 1);
+    //gl_Position = MVP * vec4(inPos, 1.0);
+    gl_Position = vec4(inPos, 1.0);
 }
 )";
 
@@ -23,30 +25,24 @@ out vec3 outColor;
 uniform vec3 inColor;
 
 void main() {
-    outColor = inColor;
-    //outColor = vec3(1, 1, 1);
+    //outColor = inColor;
+    outColor = vec3(1, 0, 0);
 }
 )";
 
-typedef struct {
-    GLfloat x;
-    GLfloat y;
-} GLfloatXY;
-
-static void projectMotionVectorCalc(GLfloatXY* pCoord, GLfloat vInit, GLfloat time, GLfloat g, GLfloat radTheta) {
-    pCoord->y = vInit * sinf(radTheta) - (g * time);
-    pCoord->x = vInit * cosf(radTheta); // redundant, does not need to be calculated each time
-}
+using namespace glm;
 
 int main() {
-    GFXWindow window(1024, 512, "Physics");
+    int WIDTH = 1024, HEIGHT = 512;
+
+    GFXWindow window(WIDTH, HEIGHT, "Physics");
 
     window.makeContextCurrent();
     window.setInputMode(GLFW_STICKY_KEYS, GL_TRUE);
 
-    GLuint VertexArrayID;
-    glGenVertexArrays(1, &VertexArrayID);
-    glBindVertexArray(VertexArrayID);
+    GLuint VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
 
     GFXShader shader(
         vertexShader,
@@ -55,116 +51,81 @@ int main() {
 
     shader.use();
 
-    GFXObject<2> vectorAll = {
-        { 0 , 0 },
-        { 0 , 0 }
-    };
-    GFXObject<2> vectorX = {
-        { 0 , 0 },
-        { 0 , 0 }
-    };
-    GFXObject<2> vectorY = {
-        { 0 , 0 },
-        { 0 , 0 }
+    GFXObject<3> triangle = {
+        { -1.0f, -1.0f, 0.0f },
+        {1.0f, -1.0f, 0.0f },
+        {0.0f,  1.0f, 0.0f }
     };
 
-    GLfloat graphX0 = -.9f;
-    GLfloat graphY0 = -.9f;
+    //
+    
+    vec3 up(0.f, 1.f, 0.f);
 
-    GFXObject<2> graphXY = {
-        { graphX0, -1.f },
-        { graphX0, 1.f },
-        { -1.f, graphY0 },
-        { 1.f, graphY0 }
+    vec3 cameraPos(4.f, 3.f, 3.f);
+    vec3 cameraTarget(0.f, 0.f, 0.f);
+    vec3 cameraDirection = normalize(cameraPos - cameraTarget);
+    vec3 cameraRight = normalize(
+        cross(up, cameraDirection)
+    );
+    vec3 cameraUp = cross(cameraDirection, cameraRight);
+
+    mat4 view = translate(
+        mat4(),
+        vec3(-3.f, 0.f, 0.f)
+    );
+
+    mat4 camera = lookAt(
+        cameraPos,
+        cameraTarget,
+        up
+    );
+
+    mat4 project = perspective(radians(45.f), (float)WIDTH / HEIGHT, .1f, 100.f);
+
+    mat4 model(1.f);
+
+    mat4 mvp = project * view * model;
+
+    //
+
+    GLuint MVPMatrixLoc = shader.getUniform("MVP");
+
+    glUniformMatrix4fv(MVPMatrixLoc, 1, GL_FALSE, value_ptr(mvp));
+
+    //
+    //
+    //
+
+    static const float triangleBuffer[] = {
+        -1.0f, -1.0f, 0.0f,
+        1.0f, -1.0f, 0.0f,
+        0.0f,  1.0f, 0.0f,
     };
 
-    GFXObject<2> graphPlot;
+    GLuint VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(
+        GL_ARRAY_BUFFER, 
+        sizeof(triangleBuffer),
+        triangleBuffer,
+        GL_STATIC_DRAW
+    );
 
-    GLuint inColorLocation = shader.getUniform("inColor");
-
-    GLfloat velocityInit = 100;
-    GLfloat g = 9.81;
-    GLfloat theta = glm::radians((GLfloat)70.f);
-
-    GLfloatXY velocityVector = {
-       velocityInit * cosf(theta),
-       velocityInit * sinf(theta)
-    };
-
-    GLfloat maxY = (velocityInit * sinf(theta)) * (velocityInit * sinf(theta)) / (2.f * g);
-    GLfloat maxX = velocityInit * velocityInit * sinf(2.f * theta) / g;
-
-    GLfloat graphXScale = 1.9 / maxX;
-    GLfloat vectorComponentScale = 150.f;
-
-    GLfloat dTime = 2.f * velocityInit * sinf(theta) / g, time = 0.f, timeStep = .005f;
-
-    for (
-        ;
-        time < dTime;
-        time += timeStep
-    ) {
-        graphPlot.addVertex({
-            ((velocityInit * cosf(theta) * time) * graphXScale) + graphX0,
-            (((velocityInit * sinf(theta) * time) - (.5f * g * time * time)) * graphXScale) + graphY0
-        });
-    }
-
-    time = 0.f;
 
     do {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // render graph XY lines
-        glUniform3f(inColorLocation, 1.f, 1.f, 1.f);
-        graphXY.render(GL_LINES);
+        //triangle.render(GL_TRIANGLES);
+        
+        glEnableVertexAttribArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glVertexAttribPointer(
+            0, 3, GL_FLOAT, GL_FALSE, 0, NULL
+        );
 
-        // render graph plot
-        graphPlot.render(GL_POINTS);
-
-        // set vector vertices
-        if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
-            vectorX.getVertex(0) = {
-                ((velocityInit * cosf(theta) * time) * graphXScale) + graphX0,
-                (((velocityInit * sinf(theta) * time) - (.5f * g * time * time)) * graphXScale) + graphY0
-            };
-
-            vectorX.getVertex(1) = {
-                vectorX.getVertex(0).at(0) + (velocityVector.x / vectorComponentScale),
-                vectorX.getVertex(0).at(1)
-            };
-
-            vectorY.getVertex(0) = vectorX.getVertex(0);
-
-            vectorY.getVertex(1) = {
-                 vectorY.getVertex(0).at(0),
-                 vectorY.getVertex(0).at(1) + (velocityVector.y / vectorComponentScale),
-            };
-
-            vectorAll.getVertex(0) = vectorX.getVertex(0);
-
-            vectorAll.getVertex(1) = {
-                vectorX.getVertex(1).at(0),
-                vectorY.getVertex(1).at(1)
-            };
-
-            projectMotionVectorCalc(&velocityVector, velocityInit, time, g, theta);
-
-            time += timeStep;
-        }
-
-        // render vector
-        glUniform3f(inColorLocation, 0.f, 1.f, 0.f);
-        vectorAll.render(GL_LINES);
-
-        // render vector y component
-        glUniform3f(inColorLocation, 1.f, 0.f, 0.f);
-        vectorY.render(GL_LINES);
-
-        // render vector x component
-        glUniform3f(inColorLocation, 0.f, 0.f, 1.f);
-        vectorX.render(GL_LINES);
-
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDisableVertexAttribArray(0);
 
         window.swapBuffers();
         glfwPollEvents();

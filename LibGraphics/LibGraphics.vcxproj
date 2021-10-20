@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ExampleApps.cpp" />
     <ClCompile Include="GFXObject.cpp" />
     <ClCompile Include="GFXShader.cpp" />
     <ClCompile Include="GFXGlobalInclude.cpp" />
@@ -154,6 +155,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ExampleApps.h" />
     <ClInclude Include="GFXObject.h" />
     <ClInclude Include="GFXShader.h" />
     <ClInclude Include="GFXGlobalInclude.h" />
