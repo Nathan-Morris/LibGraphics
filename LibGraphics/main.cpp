@@ -12,8 +12,8 @@ layout (location = 0) in vec3 inPos;
 uniform mat4 MVP;
 
 void main() {
-    //gl_Position = MVP * vec4(inPos, 1.0);
-    gl_Position = vec4(inPos, 1.0);
+    gl_Position = MVP * vec4(inPos, 1.0);
+    //gl_Position = vec4(inPos, 1.0);
 }
 )";
 
@@ -61,21 +61,10 @@ int main() {
     
     vec3 up(0.f, 1.f, 0.f);
 
-    vec3 cameraPos(4.f, 3.f, 3.f);
     vec3 cameraTarget(0.f, 0.f, 0.f);
-    vec3 cameraDirection = normalize(cameraPos - cameraTarget);
-    vec3 cameraRight = normalize(
-        cross(up, cameraDirection)
-    );
-    vec3 cameraUp = cross(cameraDirection, cameraRight);
 
-    mat4 view = translate(
-        mat4(),
-        vec3(-3.f, 0.f, 0.f)
-    );
-
-    mat4 camera = lookAt(
-        cameraPos,
+    mat4 view = lookAt(
+        vec3(3.f, 3.f, 3.f),
         cameraTarget,
         up
     );
@@ -97,9 +86,9 @@ int main() {
     //
 
     static const float triangleBuffer[] = {
-        -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        0.0f,  1.0f, 0.0f,
+        -1.0f, -1.0f, 1.0f,
+        1.0f, -1.0f, 1.0f,
+        0.0f,  1.0f, 1.0f,
     };
 
     GLuint VBO;
@@ -114,7 +103,7 @@ int main() {
 
 
     do {
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         //triangle.render(GL_TRIANGLES);
         
