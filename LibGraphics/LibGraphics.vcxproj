@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ExampleApps.cpp" />
+    <ClCompile Include="GFXCamera.cpp" />
     <ClCompile Include="GFXObject.cpp" />
     <ClCompile Include="GFXShader.cpp" />
     <ClCompile Include="GFXGlobalInclude.cpp" />
@@ -156,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ExampleApps.h" />
+    <ClInclude Include="GFXCamera.h" />
     <ClInclude Include="GFXObject.h" />
     <ClInclude Include="GFXShader.h" />
     <ClInclude Include="GFXGlobalInclude.h" />
