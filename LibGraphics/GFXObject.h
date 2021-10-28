@@ -1,34 +1,6 @@
-#include "GFXGlobalInclude.h"
+#include "GFXDataBuffer.h"
 
 #pragma once
-
-template<const GLuint dimensions>
-struct GFXVertex {
-	GLfloat vertex[dimensions] = { 0.f };
-
-	GFXVertex() { }
-
-	GFXVertex(GLfloat fill) {
-		for (GLuint i = 0; i != dimensions; i++) {
-			this->vertex[i] = fill;
-		}
-	}
-
-	GFXVertex(const std::initializer_list<GLfloat>& initVertex) {
-		std::initializer_list<GLfloat>::const_iterator initVertexIter = initVertex.begin();
-		for (
-			GLuint i = 0;
-			(i != dimensions) && (initVertexIter != initVertex.end()); 
-			i++, initVertexIter++
-		) {
-			this->vertex[i] = *initVertexIter;
-		}
-	}
-
-	GLfloat& at(size_t offset) { return this->vertex[offset]; }
-	
-	GLfloat& operator[](size_t offset) { return this->vertex[offset]; }
-};
 
 
 /*
@@ -55,51 +27,36 @@ template<const GLuint vertexDimensions>
 class GFXObject {
 protected:
 	GFXObjectHints hints;
-
-	std::vector<GFXVertex<vertexDimensions>> vertices;
-
-	GLuint VBO;
+	GFXDataBuffer<vertexDimensions> data;
 
 public:
-	GFXObject(const GFXObjectHints& objHints) : hints(objHints) {
-		glGenBuffers(1, &this->VBO);
-	}
+	GFXObject(const GFXObjectHints& objHints) : hints(objHints) {}
 
-	GFXObject() : GFXObject(GFXObjectHints({ 0 })) {
-
-	}
+	GFXObject() : GFXObject(GFXObjectHints({ 0 })) {}
 
 	GFXObject(const std::initializer_list<GFXVertex<vertexDimensions>>& initVertices) : GFXObject(GFXObjectHints({ 0 })) {
-		this->vertices.insert(this->vertices.begin(), initVertices);
+		this->data = GFXDataBuffer<vertexDimensions>(initVertices);
 	}
 
-	~GFXObject() {
-		glDeleteBuffers(1, &this->VBO);
-	}
+	~GFXObject() {}
 	
 	void addVertex(const GFXVertex<vertexDimensions>& vertex) {
-		this->vertices.push_back(vertex);
+		this->data.dataAdd(vertex);
 	}
-
+	
 	GFXVertex<vertexDimensions>& getVertex(size_t at) {
-		return this->vertices.at(at);
+		return this->data.dataAt(at);
 	}
 
 	void render(GLenum drawMode) {
 		glEnableVertexAttribArray(0);
 		
-		glBindBuffer(GL_ARRAY_BUFFER, this->VBO);
-		
-		if (!this->hints.staticVertices || !this->hints.bufferedVertices) {
-			glBufferData(
-				GL_ARRAY_BUFFER,
-				sizeof(GFXVertex<vertexDimensions>) * vertices.size(),
-				vertices.data(),
-				this->hints.staticVertices ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW
-			);
+		this->data.putData(this->hints.staticVertices);
 
-			this->hints.bufferedVertices = true;
-		}
+		//if (!this->hints.staticVertices || !this->hints.bufferedVertices) {
+		//	this->data.putData(this->hints.staticVertices);
+		//	this->hints.bufferedVertices = true;
+		//}
 		
 		glVertexAttribPointer(
 			0,
@@ -113,7 +70,7 @@ public:
 		glDrawArrays(
 			drawMode,
 			0,
-			this->vertices.size()
+			this->data.dataCount()
 		);
 		
 		glDisableVertexAttribArray(0);

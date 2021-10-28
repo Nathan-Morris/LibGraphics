@@ -149,18 +149,24 @@
   <ItemGroup>
     <ClCompile Include="ExampleApps.cpp" />
     <ClCompile Include="GFXCamera.cpp" />
+    <ClCompile Include="GFXDataBuffer.cpp" />
+    <ClCompile Include="GFXMaterial.cpp" />
     <ClCompile Include="GFXObject.cpp" />
     <ClCompile Include="GFXShader.cpp" />
     <ClCompile Include="GFXGlobalInclude.cpp" />
+    <ClCompile Include="GFXVertex.cpp" />
     <ClCompile Include="GFXWindow.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ExampleApps.h" />
     <ClInclude Include="GFXCamera.h" />
+    <ClInclude Include="GFXDataBuffer.h" />
+    <ClInclude Include="GFXMaterial.h" />
     <ClInclude Include="GFXObject.h" />
     <ClInclude Include="GFXShader.h" />
     <ClInclude Include="GFXGlobalInclude.h" />
+    <ClInclude Include="GFXVertex.h" />
     <ClInclude Include="GFXWindow.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
