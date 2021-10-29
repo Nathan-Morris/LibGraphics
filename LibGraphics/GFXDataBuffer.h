@@ -40,6 +40,10 @@ public:
 		return this->dataCount() * sizeof(GFXVertex<dataDimension>);
 	}
 
+	GLfloat* dataPtr() {
+		return (GLfloat*)this->data.data();
+	}
+
 	// moves data in `data` to `id` buffer 
 	void putData(bool staticDraw = false) {
 		this->bind();

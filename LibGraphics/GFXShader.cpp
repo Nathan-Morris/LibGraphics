@@ -55,8 +55,6 @@ GFXShader::GFXShader(
 		throw std::runtime_error("Failed To Link Shader Program");
 	}
 
-	// TODO detach & delete shaders
-
 	glDetachShader(this->gfxShaderProgramId, gfxVertexShaderId);
 	glDetachShader(this->gfxShaderProgramId, gfxFragmentShaderId);
 
