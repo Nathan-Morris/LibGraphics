@@ -7,12 +7,15 @@ class GFXMaterial
 {
 private:
 	GLuint VAO;
-
 	std::vector<GFXDataBuffer<vertexDimensions>> vertexBuffers;
 
 public:
 	GFXMaterial() {
 		glGenVertexArrays(1, &this->VAO);
+	}
+
+	GFXMaterial(const GFXMaterial<vertexDimensions>& materialRef) {
+		this->vertexBuffers = materialRef.vertexBuffers;
 	}
 
 	~GFXMaterial() {
@@ -29,20 +32,22 @@ public:
 	void enable() {
 		for (size_t i = 0; i != this->vertexBuffers.size(); i++) {
 			GFXDataBuffer<vertexDimensions>& dataBuffer = this->vertexBuffers.at(i);
-			
 			glEnableVertexAttribArray(i);
-
 			glVertexAttribPointer(
 				i, dataBuffer.dataLength(), GL_FLOAT, GL_FALSE, sizeof(GFXVertex<vertexDimensions>), dataBuffer.dataPtr()
 			);
 		}
 	}
 
-
-
 	void disable() {
 		for (size_t i = 0; i != vertexBuffers; i++) {
 			glDisableVertexAttribArray(i);
 		}
+	}
+
+public:
+	GFXMaterial<vertexDimensions>& operator=(const GFXMaterial<vertexDimensions>& materialRef) {
+		this->vertexBuffers = materialRef.vertexBuffers;
+		return *this;
 	}
 };

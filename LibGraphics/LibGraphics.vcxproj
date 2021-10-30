@@ -157,6 +157,7 @@
     <ClCompile Include="GFXVertex.cpp" />
     <ClCompile Include="GFXWindow.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="_GFXShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ExampleApps.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="GFXGlobalInclude.h" />
     <ClInclude Include="GFXVertex.h" />
     <ClInclude Include="GFXWindow.h" />
+    <ClInclude Include="_GFXShader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

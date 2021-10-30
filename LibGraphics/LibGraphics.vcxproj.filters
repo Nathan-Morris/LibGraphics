@@ -45,6 +45,9 @@
     <ClCompile Include="GFXVertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="_GFXShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GFXGlobalInclude.h">
@@ -72,6 +75,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GFXVertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="_GFXShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
