@@ -27,12 +27,6 @@
     <ClCompile Include="GFXObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GFXShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ExampleApps.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GFXCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,7 +39,10 @@
     <ClCompile Include="GFXVertex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="_GFXShader.cpp">
+    <ClCompile Include="GFXShaderProgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GFXShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -57,12 +54,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GFXObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GFXShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ExampleApps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GFXCamera.h">
@@ -77,7 +68,10 @@
     <ClInclude Include="GFXVertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="_GFXShader.h">
+    <ClInclude Include="GFXShaderProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GFXShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

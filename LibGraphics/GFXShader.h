@@ -2,30 +2,70 @@
 
 #pragma once
 
+
+// min = [0] ...0000 -> max = [8] ...1000
+typedef enum : unsigned char {
+	GFX_NONE = 0,
+	GFX_BOOL = 1,
+	GFX_INT = 2,
+	GFX_UINT = 3,
+	GFX_FLOAT = 4,
+	GFX_DOUBLE = 5,
+
+	GFX_VEC = 6,
+	GFX_MAT = 7,
+	GFX_ARRAY = 8,
+} GFXShaderDataType;
+
+class GFXShaderUniformInfo {
+public:
+	const char* name;
+	unsigned char size;
+	GFXShaderDataType type : 4;
+	GFXShaderDataType subType : 4;
+};
+
 class GFXShader
 {
 private:
-	GLuint gfxShaderProgramId;
+	unsigned short version = 330;
+	std::vector<GFXShaderUniformInfo> uniforms;
+	std::vector<char> code;
+	GLuint layoutIdMax;
+	GLuint shaderId = 0;
+	GLenum shaderType;
 
 public:
-	GFXShader(
-		const char* vertexShaderSource,
-		int vertexShaderSourceLen,
-		const char* fragmentShaderSource,
-		int fragmentShaderSourceLen,
-		FILE* errorOutputFile = stderr
-	);
+	GFXShader(GLenum shaderType);
 
-	GFXShader(
-		const char* vertexShaderSource,
-		const char* fragmentShaderSource,
-		FILE* errorOutputFile = stderr
-	);
+	GFXShader& setCode(const char* code);
+	GFXShader& setCode(std::istream& inStream);
 
-	GLuint programId();
+	GFXShader& declareUniform(const char* name, GFXShaderDataType type, GFXShaderDataType subType, unsigned char size);
+	GFXShader& declareUniform(const char* name, GFXShaderDataType type, unsigned char size);
+	GFXShader& declareUniform(const char* name, GFXShaderDataType type);
 
-	GLuint getUniform(const char* uniformName);
+	const char* codePtr() const;
+	size_t codeLen() const;
 
-	void use();
+	GLenum type() const;
+
+	const GLuint& id() const;
+	GLuint& id();
 };
 
+/*
+#version 330 core
+
+layout (location = 0) in vec3 inPos;
+layout (location = 1) in vec3 vertexColor;
+
+uniform mat4 MVP;
+
+out vec3 fragmentColor;
+
+void main() {
+	gl_Position = MVP * vec4(inPos, 1.0);
+	fragmentColor = vertexColor;
+}
+*/

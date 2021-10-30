@@ -1,10 +1,8 @@
 #include "GFXWindow.h"
 #include "GFXObject.h"
-#include "GFXShader.h"
 #include "GFXCamera.h"
 #include "GFXMaterial.h"
-
-#include "ExampleApps.h"
+#include "GFXShaderProgram.h"
 
 /*
 [[Possible Class Name GFXMaterial]]
@@ -77,11 +75,15 @@ int main() {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
-    GFXShader shader(
-        vertexShader,
-        fragmentShader
-    );
+    GFXShaderProgram shader;
 
+    shader.addShader(
+        GFXShader(GL_VERTEX_SHADER).setCode(vertexShader)
+    ).addShader(
+        GFXShader(GL_FRAGMENT_SHADER).setCode(fragmentShader)
+    );
+    shader.compile();
+    shader.link();
     shader.use();
 
     GFXMaterial<3> material;

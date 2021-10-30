@@ -1,81 +1,81 @@
 #include "GFXShader.h"
 
-GFXShader::GFXShader(
-	const char* vertexShaderSource,
-	int vertexShaderSourceLen,
-	const char* fragmentShaderSource,
-	int fragmentShaderSourceLen,
-	FILE* errOutputFile
-) {
-	GLint compilationLogLength;
-	GLuint gfxVertexShaderId, gfxFragmentShaderId;
+//
+//
+//
 
-	// vertex shader compilation
-	gfxVertexShaderId = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(gfxVertexShaderId, 1, &vertexShaderSource, &vertexShaderSourceLen);
-	glCompileShader(gfxVertexShaderId);
-	glGetShaderiv(gfxVertexShaderId, GL_INFO_LOG_LENGTH, &compilationLogLength);
-	// vertex shader failed compilation
-	if (compilationLogLength) {
-		char* compilationLogBuffer = new char[compilationLogLength + 1]();
-		glGetShaderInfoLog(gfxVertexShaderId, compilationLogLength, NULL, compilationLogBuffer);
-		fputs(compilationLogBuffer, errOutputFile);
-		delete[] compilationLogBuffer;
-		throw std::runtime_error("Failed To Compile Vertex Shader Program");
-	}
+GFXShader::GFXShader(GLenum shaderType) : shaderType(shaderType) { 
 
-	// fragment shader compilation
-	gfxFragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(gfxFragmentShaderId, 1, &fragmentShaderSource, &fragmentShaderSourceLen);
-	glCompileShader(gfxFragmentShaderId);
-	glGetShaderiv(gfxFragmentShaderId, GL_INFO_LOG_LENGTH, &compilationLogLength);
-	// fragment shader failed compilation
-	if (compilationLogLength) {
-		char* compilationLogBuffer = new char[compilationLogLength + 1]();
-		glGetShaderInfoLog(gfxFragmentShaderId, compilationLogLength, NULL, compilationLogBuffer);
-		fputs(compilationLogBuffer, errOutputFile);
-		delete[] compilationLogBuffer;
-		throw std::runtime_error("Failed To Compile Fragment Shader Program");
-	}
-
-	this->gfxShaderProgramId = glCreateProgram();
-
-	glAttachShader(this->gfxShaderProgramId, gfxVertexShaderId);
-	glAttachShader(this->gfxShaderProgramId, gfxFragmentShaderId);
-
-	glLinkProgram(this->gfxShaderProgramId);
-
-	glGetProgramiv(this->gfxShaderProgramId, GL_INFO_LOG_LENGTH, &compilationLogLength);
-
-	if (compilationLogLength) {
-		char* compilationLogBuffer = new char[compilationLogLength + 1]();
-		glGetProgramInfoLog(this->gfxShaderProgramId, compilationLogLength, NULL, compilationLogBuffer);
-		fputs(compilationLogBuffer, errOutputFile);
-		delete[] compilationLogBuffer;
-		throw std::runtime_error("Failed To Link Shader Program");
-	}
-
-	glDetachShader(this->gfxShaderProgramId, gfxVertexShaderId);
-	glDetachShader(this->gfxShaderProgramId, gfxFragmentShaderId);
-
-	glDeleteShader(gfxVertexShaderId);
-	glDeleteShader(gfxFragmentShaderId);
 }
 
-GFXShader::GFXShader(
-	const char* vertexShaderSource,
-	const char* fragmentShaderSource,
-	FILE* errOutputFile
-) : GFXShader(vertexShaderSource, strlen(vertexShaderSource), fragmentShaderSource, strlen(fragmentShaderSource), errOutputFile) { }
 
-GLuint GFXShader::programId() {
-	return this->gfxShaderProgramId;
+GFXShader& GFXShader::setCode(const char* code) {
+	size_t len = strlen(code);
+	this->code.resize(len);
+	memcpy(this->code.data(), code, len);
+	return *this;
 }
 
-GLuint GFXShader::getUniform(const char* uniformName) {
-	return glGetUniformLocation(this->gfxShaderProgramId, uniformName);
+GFXShader& GFXShader::setCode(std::istream& inStream) {
+	inStream.seekg(0, std::ios::end);
+	
+	size_t len = inStream.tellg();
+
+	if (len > 0) {
+		this->code.resize(len);
+		inStream.read(this->code.data(), len);
+	}
+
+	return *this;
 }
 
-void GFXShader::use() {
-	glUseProgram(this->gfxShaderProgramId);
+GFXShader& GFXShader::declareUniform(const char* name, GFXShaderDataType type, GFXShaderDataType subType, unsigned char size) {
+	GFXShaderUniformInfo info = { 0 };
+	info.name = name;
+	info.type = type;
+
+	switch (info.type)
+	{
+	case GFX_VEC:
+	case GFX_MAT:
+	case GFX_ARRAY:
+		info.subType = subType;
+		info.size = size;
+		break;
+	}
+
+	this->uniforms.push_back(info);
+
+	return *this;
+}
+
+GFXShader& GFXShader::declareUniform(const char* name, GFXShaderDataType type, unsigned char size) {
+	return this->declareUniform(name, type, (type == GFX_VEC) ? GFX_FLOAT : GFX_NONE, size);
+}
+
+
+GFXShader& GFXShader::declareUniform(const char* name, GFXShaderDataType type) {
+	if (type != GFX_NONE && type != GFX_VEC && type != GFX_MAT && type != GFX_ARRAY)
+		return this->declareUniform(name, type, GFX_NONE, 0);
+	return *this;
+}
+
+const char* GFXShader::codePtr() const {
+	return this->code.data();
+}
+
+size_t GFXShader::codeLen() const {
+	return this->code.size();
+}
+
+const GLuint& GFXShader::id() const {
+	return this->shaderId; 
+}
+
+GLuint& GFXShader::id() {
+	return this->shaderId;
+}
+
+GLenum GFXShader::type() const {
+	return this->shaderType;
 }
