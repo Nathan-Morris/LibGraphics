@@ -18,40 +18,34 @@ GFXShader
 
 const char* vertexShader = R"(
 #version 330 core
-
 layout (location = 0) in vec3 inPos;
-layout (location = 1) in vec3 vertexColor;
-
 uniform mat4 MVP;
-
 out vec3 fragmentColor;
-
 void main() {
     gl_Position = MVP * vec4(inPos, 1.0);
-    fragmentColor = vertexColor;
 }
 )";
 
 const char* fragmentShader = R"(
 #version 330 core
-
-in vec3 inColor;
 out vec3 outColor;
-
 void main() {
-    //outColor = inColor;
     outColor = vec3(1,0,0);
 }
 )";
 
 using namespace glm;
 
-void GLAPIENTRY
-MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-    fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
+    fprintf(stderr, "GL: %s type = 0x%x, severity = 0x%x, message = %s\n",
         (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
         type, severity, message);
 }
+
+static void transLate(GFXVertex<3>& vertex) {
+    vertex.at(1) += .5;
+}
+
 
 static inline GLfloat& cirInc(GLfloat& in, GLfloat inc, GLfloat lower, GLfloat upper) {
     in += inc;
@@ -71,9 +65,9 @@ int main() {
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(MessageCallback, 0);
 
-    GLuint VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+    //
+    //
+    //
 
     GFXShaderProgram shader;
 
@@ -82,82 +76,90 @@ int main() {
     ).addShader(
         GFXShader(GL_FRAGMENT_SHADER).setCode(fragmentShader)
     );
-    shader.compile();
-    shader.link();
-    shader.use();
 
-    GFXMaterial<3> material;
+    GFXMaterial<3> cube(shader);
+    cube.putVertexBuffer(0, {
+        {-1.0f,-1.0f,-1.0f,}, {-1.0f,-1.0f, 1.0f,}, {-1.0f, 1.0f, 1.0f,}, {1.0f, 1.0f,-1.0f, },
+        {-1.0f,-1.0f,-1.0f,}, {-1.0f, 1.0f,-1.0f,}, {1.0f,-1.0f, 1.0f, }, {-1.0f,-1.0f,-1.0f,},
+        {1.0f,-1.0f,-1.0f, }, {1.0f, 1.0f,-1.0f, }, {1.0f,-1.0f,-1.0f, }, {-1.0f,-1.0f,-1.0f,},
+        {-1.0f,-1.0f,-1.0f,}, {-1.0f, 1.0f, 1.0f,}, {-1.0f, 1.0f,-1.0f,}, {1.0f,-1.0f, 1.0f, },
+        {-1.0f,-1.0f, 1.0f,}, {-1.0f,-1.0f,-1.0f,}, {-1.0f, 1.0f, 1.0f,}, {-1.0f,-1.0f, 1.0f,},
+        {1.0f,-1.0f, 1.0f, }, {1.0f, 1.0f, 1.0f, }, {1.0f,-1.0f,-1.0f, }, {1.0f, 1.0f,-1.0f, },
+        {1.0f,-1.0f,-1.0f, }, {1.0f, 1.0f, 1.0f, }, {1.0f,-1.0f, 1.0f, }, {1.0f, 1.0f, 1.0f, },
+        {1.0f, 1.0f,-1.0f, }, {-1.0f, 1.0f,-1.0f,}, {1.0f, 1.0f, 1.0f, }, {-1.0f, 1.0f,-1.0f,},
+        {-1.0f, 1.0f, 1.0f,}, {1.0f, 1.0f, 1.0f, }, {-1.0f, 1.0f, 1.0f,}, {1.0f,-1.0f, 1.0f  }
+    });
+    cube.shader().compile();
+    cube.shader().link();
 
-    GFXObject<3> triangle = {
-        {-1.0f,-1.0f,-1.0f,}, {-1.0f,-1.0f, 1.0f,},
-        {-1.0f, 1.0f, 1.0f,}, {1.0f, 1.0f,-1.0f, },
-        {-1.0f,-1.0f,-1.0f,}, {-1.0f, 1.0f,-1.0f,},
-        {1.0f,-1.0f, 1.0f, }, {-1.0f,-1.0f,-1.0f,},
-        {1.0f,-1.0f,-1.0f, }, {1.0f, 1.0f,-1.0f, },
-        {1.0f,-1.0f,-1.0f, }, {-1.0f,-1.0f,-1.0f,},
-        {-1.0f,-1.0f,-1.0f,}, {-1.0f, 1.0f, 1.0f,},
-        {-1.0f, 1.0f,-1.0f,}, {1.0f,-1.0f, 1.0f, },
-        {-1.0f,-1.0f, 1.0f,}, {-1.0f,-1.0f,-1.0f,},
-        {-1.0f, 1.0f, 1.0f,}, {-1.0f,-1.0f, 1.0f,},
-        {1.0f,-1.0f, 1.0f, }, {1.0f, 1.0f, 1.0f, },
-        {1.0f,-1.0f,-1.0f, }, {1.0f, 1.0f,-1.0f, },
-        {1.0f,-1.0f,-1.0f, }, {1.0f, 1.0f, 1.0f, },
-        {1.0f,-1.0f, 1.0f, }, {1.0f, 1.0f, 1.0f, },
-        {1.0f, 1.0f,-1.0f, }, {-1.0f, 1.0f,-1.0f,},
-        {1.0f, 1.0f, 1.0f, }, {-1.0f, 1.0f,-1.0f,},
-        {-1.0f, 1.0f, 1.0f,}, {1.0f, 1.0f, 1.0f, },
-        {-1.0f, 1.0f, 1.0f,}, {1.0f,-1.0f, 1.0f  }
-    };
 
-    GFXDataBuffer<3> vertexColorData = {
-        {0.583f,  0.771f,  0.014f}, {0.609f,  0.115f,  0.436f},
-        {0.327f,  0.483f,  0.844f}, {0.822f,  0.569f,  0.201f},
-        {0.435f,  0.602f,  0.223f}, {0.310f,  0.747f,  0.185f},
-        {0.597f,  0.770f,  0.761f}, {0.559f,  0.436f,  0.730f},
-        {0.359f,  0.583f,  0.152f}, {0.483f,  0.596f,  0.789f},
-        {0.559f,  0.861f,  0.639f}, {0.195f,  0.548f,  0.859f},
-        {0.014f,  0.184f,  0.576f}, {0.771f,  0.328f,  0.970f},
-        {0.406f,  0.615f,  0.116f}, {0.676f,  0.977f,  0.133f},
-        {0.971f,  0.572f,  0.833f}, {0.140f,  0.616f,  0.489f},
-        {0.997f,  0.513f,  0.064f}, {0.945f,  0.719f,  0.592f},
-        {0.543f,  0.021f,  0.978f}, {0.279f,  0.317f,  0.505f},
-        {0.167f,  0.620f,  0.077f}, {0.347f,  0.857f,  0.137f},
-        {0.055f,  0.953f,  0.042f}, {0.714f,  0.505f,  0.345f},
-        {0.783f,  0.290f,  0.734f}, {0.722f,  0.645f,  0.174f},
-        {0.302f,  0.455f,  0.848f}, {0.225f,  0.587f,  0.040f},
-        {0.517f,  0.713f,  0.338f}, {0.053f,  0.959f,  0.120f},
-        {0.393f,  0.621f,  0.362f}, {0.673f,  0.211f,  0.457f},
-        {0.820f,  0.883f,  0.371f}, {0.982f,  0.099f,  0.879f}
-    };
+
+    GFXMaterial<3> pyramid(
+        GFXShaderProgram().addShader(
+            GFXShader(GL_VERTEX_SHADER).setCode(
+                "\n#version 330 core\nlayout(location = 0) in vec3 inPos;\nuniform mat4 MVPPyramid;\nout vec3 fragmentColor;\nvoid main() {\ngl_Position = MVPPyramid * vec4(inPos, 1.0);\n}"
+            )
+        ).addShader(
+            GFXShader(GL_FRAGMENT_SHADER).setCode(
+                "#version 330 core\nout vec3 outColor;\nvoid main() {\noutColor = vec3(0,1,0);\n}"
+            )
+        )
+    );
+    pyramid.putVertexBuffer(0, {
+        { 0, 1, 0 }, {.5, 0, -.5}, {.5, 0, .5},
+        { 0, 1, 0 }, {.5, 0, .5}, {-.5, 0, .5},
+        { 0, 1, 0 }, {-.5, 0, -.5}, {-.5, 0, .5},
+        { 0, 1, 0 }, {-.5, 0, -.5}, {.5, 0, -.5},
+        { -.5, 0, .5 }, {-.5, 0, -.5}, {.5, 0, -.5},
+        { -.5, 0, .5 }, {.5, 0, .5}, {.5, 0, -.5},
+    });
+    pyramid.shader().compile();
+    pyramid.shader().link();
+    pyramid.getVertexBuffer(0).dataTranslate(transLate);
 
     //
 
     GFXCamera camera(
-        vec3(3, 3, 3),
+        vec3(4, 4, 4),
         vec3(0,0,0),
         WIDTH,
         HEIGHT,
         45
     );
     
-    GLuint MVPMatrixLoc = shader.getUniform("MVP");
-    
     GLfloat cameraTheta = 0;
+
+    //glEnable(GL_DEPTH_TEST);
+
+    bool which = false;
 
     do {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        triangle.render(GL_TRIANGLES);
-        
+        pyramid.drawArrays(GL_TRIANGLES);
+        cube.drawArrays(GL_TRIANGLES);
+
+        // this works, but good god...
+       /* if (which) {
+            pyramid.drawArrays(GL_TRIANGLES);
+            cube.drawArrays(GL_TRIANGLES);
+        }
+        else {
+            cube.drawArrays(GL_TRIANGLES);
+            pyramid.drawArrays(GL_TRIANGLES);
+        }
+        which = !which;*/
+
         camera.view() = lookAt(
             vec3(cosf(cameraTheta) * 10.f, 2.f, sinf(cameraTheta) * 10.f),
             vec3(0, 0, 0),
             vec3(0, 1, 0)
         );
 
-        cirInc(cameraTheta, .001f, 0, radians(360.f));
+        cirInc(cameraTheta, .01f, 0, radians(360.f));
 
-        camera.loadModelViewProjection(MVPMatrixLoc);
+        camera.loadModelViewProjection(cube.shader().uniformLocation("MVP"));
+        camera.loadModelViewProjection(pyramid.shader().uniformLocation("MVPPyramid"));
 
         window.swapBuffers();
         glfwPollEvents();

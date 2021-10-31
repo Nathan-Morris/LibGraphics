@@ -28,7 +28,6 @@ public:
 class GFXShader
 {
 private:
-	unsigned short version = 330;
 	std::vector<GFXShaderUniformInfo> uniforms;
 	std::vector<char> code;
 	GLuint layoutIdMax;
@@ -40,10 +39,6 @@ public:
 
 	GFXShader& setCode(const char* code);
 	GFXShader& setCode(std::istream& inStream);
-
-	GFXShader& declareUniform(const char* name, GFXShaderDataType type, GFXShaderDataType subType, unsigned char size);
-	GFXShader& declareUniform(const char* name, GFXShaderDataType type, unsigned char size);
-	GFXShader& declareUniform(const char* name, GFXShaderDataType type);
 
 	const char* codePtr() const;
 	size_t codeLen() const;

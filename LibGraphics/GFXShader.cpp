@@ -29,37 +29,6 @@ GFXShader& GFXShader::setCode(std::istream& inStream) {
 	return *this;
 }
 
-GFXShader& GFXShader::declareUniform(const char* name, GFXShaderDataType type, GFXShaderDataType subType, unsigned char size) {
-	GFXShaderUniformInfo info = { 0 };
-	info.name = name;
-	info.type = type;
-
-	switch (info.type)
-	{
-	case GFX_VEC:
-	case GFX_MAT:
-	case GFX_ARRAY:
-		info.subType = subType;
-		info.size = size;
-		break;
-	}
-
-	this->uniforms.push_back(info);
-
-	return *this;
-}
-
-GFXShader& GFXShader::declareUniform(const char* name, GFXShaderDataType type, unsigned char size) {
-	return this->declareUniform(name, type, (type == GFX_VEC) ? GFX_FLOAT : GFX_NONE, size);
-}
-
-
-GFXShader& GFXShader::declareUniform(const char* name, GFXShaderDataType type) {
-	if (type != GFX_NONE && type != GFX_VEC && type != GFX_MAT && type != GFX_ARRAY)
-		return this->declareUniform(name, type, GFX_NONE, 0);
-	return *this;
-}
-
 const char* GFXShader::codePtr() const {
 	return this->code.data();
 }

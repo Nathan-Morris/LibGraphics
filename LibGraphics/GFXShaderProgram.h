@@ -2,11 +2,17 @@
 
 #pragma once
 
+struct ConstCharPtrCmp {
+	bool operator()(const char* a, const char* b) const;
+};
+
 class GFXShaderProgram
 {
 private:
-	GLuint id = 0;
+	unsigned int id = 0;
+	bool compiled = false, linked = false;
 	std::vector<GFXShader> shaders;
+	std::map<const char*, unsigned int, ConstCharPtrCmp> uniformLocations;
 
 public:
 	GFXShaderProgram();
@@ -16,10 +22,8 @@ public:
 	bool compile(FILE* errOut = stderr);
 	bool link(FILE* errOut = stderr);
 
-	inline unsigned int getUniform(const char* name) {
-		return glGetUniformLocation(this->id, name);
-	}
+	unsigned int uniformLocation(const char* uniformName);
 
-	void use();
+	void use() const;
 };
 

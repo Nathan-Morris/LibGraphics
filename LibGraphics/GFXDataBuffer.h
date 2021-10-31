@@ -15,7 +15,8 @@ public:
 	}
 
 	GFXDataBuffer(const GFXDataBuffer<dataDimension>& dataBufferRef) 
-		: GFXDataBuffer(dataBufferRef.type), data(dataBufferRef.data){
+		: GFXDataBuffer(dataBufferRef.type) {
+		this->data = dataBufferRef.data;
 	}
 
 	GFXDataBuffer(const std::initializer_list<GFXVertex<dataDimension>>& initVertices) : GFXDataBuffer((GLenum)GL_ARRAY_BUFFER) {
@@ -30,17 +31,28 @@ public:
 		glBindBuffer(this->type, this->id);
 	}
 
+	void dataTranslate(void(*translationCallback)(GFXVertex<dataDimension>&)) {
+		//this->bind();
+		for (GFXVertex<dataDimension>& dataVertex : this->data) {
+			translationCallback(dataVertex);
+		}
+	}
+
 	// returns number of elements in `data`
-	size_t dataCount() {
+	size_t dataCount() const {
 		return this->data.size();
 	}
 
 	// returns size in bytes of `data` array
-	size_t dataLength() {
+	size_t dataLength() const {
 		return this->dataCount() * sizeof(GFXVertex<dataDimension>);
 	}
 
 	GLfloat* dataPtr() {
+		return (GLfloat*)this->data.data();
+	}
+
+	const GLfloat* dataPtr() const {
 		return (GLfloat*)this->data.data();
 	}
 
@@ -65,6 +77,7 @@ public:
 
 public:
 	GFXDataBuffer<dataDimension>& operator=(const GFXDataBuffer<dataDimension>& dataBufferRef) {
+		this->type = dataBufferRef.type;
 		this->data = dataBufferRef.data;
 		return *this;
 	}

@@ -1,5 +1,13 @@
 #include "GFXShaderProgram.h"
 
+bool ConstCharPtrCmp::operator()(const char* a, const char* b) const {
+	return strcmp(a, b) < 0;
+}
+
+//
+//
+//
+
 GFXShaderProgram::GFXShaderProgram() {
 
 }
@@ -10,6 +18,10 @@ GFXShaderProgram& GFXShaderProgram::addShader(const GFXShader& shader) {
 }
 
 bool GFXShaderProgram::compile(FILE* errOut) {
+	if (this->compiled) {
+		return true;
+	}
+
 	std::vector<char> compilationLogBuffer;
 	int compilationLogLength;
 	unsigned int shaderId;
@@ -37,10 +49,14 @@ bool GFXShaderProgram::compile(FILE* errOut) {
 		shader.id() = shaderId;
 	}
 
-	return true;
+	return (this->compiled = true);
 }
 
 bool GFXShaderProgram::link(FILE* errOut ) {
+	if (this->linked) {
+		return true;
+	}
+
 	// todo check if already linked
 	std::vector<char> linkingLogBuffer;
 	int linkingLogLength;
@@ -68,10 +84,22 @@ bool GFXShaderProgram::link(FILE* errOut ) {
 		glDeleteShader(shader.id());
 	}
 
-	return true;
+	return (this->linked = true);
 }
 
-void GFXShaderProgram::use() {
+unsigned int GFXShaderProgram::uniformLocation(const char* uniformName) {
+	auto uniformMapIter = this->uniformLocations.find(uniformName);
+	if (uniformMapIter != this->uniformLocations.end()) {
+		return uniformMapIter->second;
+	}
+	else {
+		return this->uniformLocations.insert(
+			std::pair<const char*, unsigned int>(uniformName, glGetUniformLocation(this->id, uniformName))
+		).first->second;
+	}
+}
+
+void GFXShaderProgram::use() const {
 	if (this->id) {
 		glUseProgram(this->id);
 	}
