@@ -75,6 +75,10 @@ public:
 		this->data.push_back(data);
 	}
 
+	unsigned int getId() {
+		return this->id;
+	}
+
 public:
 	GFXDataBuffer<dataDimension>& operator=(const GFXDataBuffer<dataDimension>& dataBufferRef) {
 		this->type = dataBufferRef.type;
