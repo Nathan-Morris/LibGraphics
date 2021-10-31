@@ -32,7 +32,6 @@ public:
 	}
 
 	void dataTranslate(void(*translationCallback)(GFXVertex<dataDimension>&)) {
-		//this->bind();
 		for (GFXVertex<dataDimension>& dataVertex : this->data) {
 			translationCallback(dataVertex);
 		}

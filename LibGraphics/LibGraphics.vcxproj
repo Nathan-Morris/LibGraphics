@@ -150,7 +150,6 @@
     <ClCompile Include="GFXCamera.cpp" />
     <ClCompile Include="GFXDataBuffer.cpp" />
     <ClCompile Include="GFXMaterial.cpp" />
-    <ClCompile Include="GFXObject.cpp" />
     <ClCompile Include="GFXGlobalInclude.cpp" />
     <ClCompile Include="GFXShaderProgram.cpp" />
     <ClCompile Include="GFXVertex.cpp" />
@@ -163,7 +162,6 @@
     <ClInclude Include="GFXCamera.h" />
     <ClInclude Include="GFXDataBuffer.h" />
     <ClInclude Include="GFXMaterial.h" />
-    <ClInclude Include="GFXObject.h" />
     <ClInclude Include="GFXGlobalInclude.h" />
     <ClInclude Include="GFXShaderProgram.h" />
     <ClInclude Include="GFXVertex.h" />

@@ -20,24 +20,6 @@ GFXShader
  - fragment passing support
 */
 
-const char* vertexShader = R"(
-#version 330 core
-layout (location = 0) in vec3 inPos;
-uniform mat4 MVP;
-out vec3 fragmentColor;
-void main() {
-    gl_Position = MVP * vec4(inPos, 1.0);
-}
-)";
-
-const char* fragmentShader = R"(
-#version 330 core
-out vec3 outColor;
-void main() {
-    outColor = vec3(1,0,0);
-}
-)";
-
 using namespace glm;
 using namespace std;
 
@@ -46,11 +28,6 @@ void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum se
         (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
         type, severity, message);
 }
-
-static void transLate(GFXVertex<3>& vertex) {
-    vertex.at(1) += .5;
-}
-
 
 static inline GLfloat& cirInc(GLfloat& in, GLfloat inc, GLfloat lower, GLfloat upper) {
     in += inc;
@@ -192,6 +169,12 @@ void main() {
         WIDTH,
         HEIGHT,
         45.f
+    );
+
+    material.getVertexBuffer(0).dataTranslate(
+        [](GFXVertex<3>& vertexData) {
+            vertexData.at(1) += 1;
+        }
     );
 
     material.shader().use();

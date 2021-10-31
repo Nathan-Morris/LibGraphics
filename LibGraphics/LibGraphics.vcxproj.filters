@@ -24,9 +24,6 @@
     <ClCompile Include="GFXWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GFXObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GFXCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -51,9 +48,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GFXWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GFXObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GFXCamera.h">
