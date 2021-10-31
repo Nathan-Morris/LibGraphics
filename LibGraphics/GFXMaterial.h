@@ -45,8 +45,8 @@ public:
 		for (size_t i = 0; i != this->mVertexBuffers.size(); i++) {
 			GFXDataBuffer<vertexDimensions>& dataBuffer = this->mVertexBuffers.at(i);
 			// TODO handle static data buffers
-			glEnableVertexAttribArray(i);
 			dataBuffer.putData(false);
+			glEnableVertexAttribArray(i);
 			glVertexAttribPointer(
 				i, vertexDimensions, GL_FLOAT, GL_FALSE, sizeof(GFXVertex<vertexDimensions>), NULL
 			);

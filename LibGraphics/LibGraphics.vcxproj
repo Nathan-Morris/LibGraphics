@@ -159,6 +159,7 @@
     <ClCompile Include="GFXShader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ExampleApps.h" />
     <ClInclude Include="GFXCamera.h" />
     <ClInclude Include="GFXDataBuffer.h" />
     <ClInclude Include="GFXMaterial.h" />

@@ -9,8 +9,8 @@ GFXCamera::GFXCamera(
 }
 
 GFXCamera::GFXCamera(
-	glm::vec3 cameraPos,
-	glm::vec3 cameraTarget,
+	const glm::vec3& cameraPos,
+	const glm::vec3& cameraTarget,
 	int width,
 	int height,
 	GLfloat fov

@@ -74,5 +74,8 @@
     <ClInclude Include="GFXShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ExampleApps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
