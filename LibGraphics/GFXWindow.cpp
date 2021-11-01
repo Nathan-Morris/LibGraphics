@@ -1,5 +1,13 @@
 #include "GFXWindow.h"
 
+void GFXWindow::setGFXWindowInstanceCallbacks(GFXWindow& windowInstance) {
+
+}
+
+//
+//
+//
+
 GFXWindow::GFXWindow(int width, int height, const char* title, GLFWmonitor* monitor, GLFWwindow* share) {
 	this->gfxWindow = glfwCreateWindow(
 		width, height, title, monitor, share
@@ -19,6 +27,15 @@ void GFXWindow::swapBuffers() {
 bool GFXWindow::isKeyPressed(int key) {
 	return (bool)glfwGetKey(this->gfxWindow, key);
 }
+
+void GFXWindow::setKeyCallback(GLFWkeyfun callback) {
+	glfwSetKeyCallback(this->gfxWindow, callback);
+}
+
+void GFXWindow::setScrollWheelCallback(GLFWscrollfun callback) {
+	glfwSetScrollCallback(this->gfxWindow, callback);
+}
+
 
 void GFXWindow::setInputMode(int mode, int value) {
 	glfwSetInputMode(this->gfxWindow, mode, value);

@@ -1,5 +1,4 @@
 #include "GFXWindow.h"
-#include "GFXObject.h"
 #include "GFXCamera.h"
 #include "GFXMaterial.h"
 #include "GFXShaderProgram.h"
@@ -37,6 +36,9 @@ static inline GLfloat& cirInc(GLfloat& in, GLfloat inc, GLfloat lower, GLfloat u
 }
 
 int main() {
+    projectileMotion();
+    
+    /*
     int WIDTH = 1024, HEIGHT = 512;
 
     GFXWindow window(WIDTH, HEIGHT, "Physics");
@@ -189,4 +191,5 @@ void main() {
         window.swapBuffers();
         glfwPollEvents();
     } while (!window.shouldClose());
+    */
 }
